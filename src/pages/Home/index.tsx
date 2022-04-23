@@ -1,5 +1,5 @@
 import * as React from "react";
-// import "./style.scss";
+import "./style.scss";
 
 export default function Home() {
   const matrix = {
@@ -14,17 +14,23 @@ export default function Home() {
     9: ['W','X','Y', 'Z'],
   }
 
+
   const [numberString, setNumberString] = React.useState('');
   const [result, setResult] = React.useState([])
 
   const handleNumberString = (e: any) => {
     const { value } = e.target
     setNumberString(value)
-    const valueCuted = value.split('')
+    let valueCuted = value.split('')
+
+    if (valueCuted.length < 2) {
+      setResult([])
+      return
+    }
 
     let result:any = []
 
-    valueCuted.forEach(function(a: any){
+    valueCuted.forEach(function(a: string){
       for (let [key, value] of Object.entries(matrix)) {
         if (key === a) {
           result.push(value)
@@ -33,35 +39,42 @@ export default function Home() {
     })
 
     let result2:any = []
-    let result3:any = []
-
-    if (result.length > 1) {
-      for(let i=0;i<result.length;i++) {
-        for(let j=0;j<result[i].length;j++) {
-          result2.push(result[i][j])
-          for(let k=0;k<result2.length;k++) {
-            result3.push(result2[k].concat(result[i][j]))
-          }
+    let tempArr = [...result];
+  
+    for(let i = 0; i < result.length; i++) {
+      tempArr.shift();
+      const itemOrigin = result[i];
+      for(let k = 0; k < itemOrigin.length; k++) {
+        for (let j = 0; j < tempArr.length; j++){
+          let a = run(itemOrigin[k], tempArr[j]);
+          result2 = result2.concat(a)
         }
       }
     }
-    setResult(result3)
+
+    setResult(result2)
+  }
+  
+  const run = (letter: string, array: any []) => {
+    let good: any = []
+    for(let i = 0; i< array.length; i++) {
+      good.push(`${letter}${array[i]}`)
+    }
+    return good
   }
 
   return (
     <div className="container">
-      {/* <TopBar backStatus={false} headingName="Eastplayers Test" /> */}
       <div className="home">
         <div className="home-list">
           <div className="home-item">
-
             <div>
-
+              <label htmlFor="">Enter number: </label>
             <input name="stringNumber" value={numberString} onChange={(e) => handleNumberString(e)} type="number"/>
             </div>
             <ul>
               {result.length > 0 && result.map((item) => (
-                <li key={item}>{item}</li>
+                <li key={Math.random()}>{item}</li>
               ))}
             </ul>
           </div>
@@ -70,3 +83,4 @@ export default function Home() {
     </div>
   );
 }
+
